@@ -1,0 +1,18 @@
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import app from "../../app.js";
+
+dotenv.config();
+
+const db = mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
+    app.listen(4000, () => {
+      console.log("server is running on http://localhost:4000");
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+  });
+  
+  export default db
