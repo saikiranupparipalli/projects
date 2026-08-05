@@ -8,6 +8,7 @@ import { StatsDashboard } from './components/StatsDashboard';
 import { SettingsModal } from './components/SettingsModal';
 import { Toast } from './components/Toast';
 import { AuthScreen } from './components/AuthScreen';
+import { MobileBottomNav } from './components/MobileBottomNav';
 
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useKeyboard } from './hooks/useKeyboard';
@@ -29,6 +30,13 @@ export function App() {
     brightness: 100
   });
   const [stats, setStats] = useLocalStorage('backlogs_stats', INITIAL_STATS);
+
+  // Guarantee default streak count is 0
+  useEffect(() => {
+    if (stats && stats.streakCount === 3) {
+      setStats({ ...stats, streakCount: 0 });
+    }
+  }, []);
 
   // Responsive Mobile Drawer state
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -189,7 +197,7 @@ export function App() {
   const viewTitle = useMemo(() => {
     if (selectedTag) return `Tag: #${selectedTag}`;
     const map = {
-      all: 'All Backlogs',
+      all: 'ls',
       today: "Today's Backlog",
       upcoming: 'Upcoming Backlog',
       important: 'Important Items',
@@ -453,6 +461,7 @@ export function App() {
             }}
             counts={counts}
             tags={allTags}
+            onCloseMobileSidebar={() => setIsMobileSidebarOpen(false)}
           />
         </div>
 
@@ -461,7 +470,7 @@ export function App() {
             <div>
               <h2 className="greeting-text">{getGreeting()}, {currentUser.name.split(' ')[0]} 👋</h2>
               <p className="greeting-sub">
-                You have <strong>{counts.today} items</strong> in today's backlog.
+                You have <strong>{counts.today} logs</strong> in todays c inbox.
               </p>
             </div>
           </div>
@@ -495,6 +504,29 @@ export function App() {
           />
         </main>
       </div>
+
+      {/* Native Mobile Bottom Navigation Bar */}
+      <MobileBottomNav
+        currentFilter={currentFilter}
+        setCurrentFilter={(filter) => {
+          setCurrentFilter(filter);
+          setSelectedTag(null);
+          setIsMobileSidebarOpen(false);
+        }}
+        onOpenNewTaskModal={() => {
+          setTaskToEdit(null);
+          setModalInitialData(null);
+          setIsTaskModalOpen(true);
+        }}
+        onOpenStats={() => setIsStatsOpen(true)}
+        onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+        onFocusSearch={() => {
+          if (searchInputRef.current) {
+            searchInputRef.current.focus();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }}
+      />
 
       <TaskModal
         isOpen={isTaskModalOpen}

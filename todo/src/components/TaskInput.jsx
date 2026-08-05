@@ -36,11 +36,11 @@ export function TaskInput({ onAddTask, onOpenFullModal }) {
         className="quick-add-input"
       />
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+      <div className="quick-add-controls">
         <select 
           value={priority}
           onChange={(e) => setPriority(e.target.value)}
-          className="custom-select"
+          className="custom-select quick-add-select"
           title="Select Priority"
         >
           <option value="low">Low Priority</option>
@@ -53,8 +53,7 @@ export function TaskInput({ onAddTask, onOpenFullModal }) {
           type="date"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          className="custom-select"
-          style={{ width: '130px' }}
+          className="custom-select quick-add-date"
         />
 
         <button 
@@ -66,7 +65,7 @@ export function TaskInput({ onAddTask, onOpenFullModal }) {
           <Expand size={15} />
         </button>
 
-        <button type="submit" className="btn-primary" style={{ padding: '0.4rem 0.85rem' }}>
+        <button type="submit" className="btn-primary quick-add-btn" style={{ padding: '0.45rem 0.95rem' }}>
           Add
         </button>
       </div>

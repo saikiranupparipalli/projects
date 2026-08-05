@@ -38,36 +38,36 @@ export function TaskCard({
 
         {/* Details */}
         <div className="task-details">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+          <div className="task-card-header-row">
             <span className="task-title-text">{task.title}</span>
 
             {/* Quick Actions */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+            <div className="task-actions-row">
               <button 
                 onClick={() => onToggleStar(task.id)}
                 style={{ color: task.starred ? '#fbbf24' : 'var(--text-subtle)' }}
-                className="icon-btn"
+                className="icon-btn task-action-btn"
                 title={task.starred ? "Unstar task" : "Star task"}
               >
                 <Star size={15} fill={task.starred ? '#fbbf24' : 'transparent'} />
               </button>
               
-              <button onClick={() => onEdit(task)} className="icon-btn" title="Edit task">
+              <button onClick={() => onEdit(task)} className="icon-btn task-action-btn" title="Edit task">
                 <Edit3 size={14} />
               </button>
 
-              <button onClick={() => onDuplicate(task)} className="icon-btn" title="Duplicate task">
+              <button onClick={() => onDuplicate(task)} className="icon-btn task-action-btn" title="Duplicate task">
                 <Copy size={14} />
               </button>
 
-              <button onClick={() => onDelete(task.id)} className="icon-btn" title="Delete task">
+              <button onClick={() => onDelete(task.id)} className="icon-btn task-action-btn" title="Delete task">
                 <Trash2 size={14} style={{ color: 'var(--priority-urgent)' }} />
               </button>
 
               {totalSubtasks > 0 && (
                 <button 
                   onClick={() => setExpanded(!expanded)} 
-                  className="icon-btn"
+                  className="icon-btn task-action-btn"
                   title={expanded ? "Hide subtasks" : "Show subtasks"}
                 >
                   {expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
@@ -97,7 +97,7 @@ export function TaskCard({
 
             {/* Subtask count */}
             {totalSubtasks > 0 && (
-              <span className="badge" style={{ background: '#18181b', color: 'var(--text-muted)' }}>
+              <span className="badge" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
                 <CheckSquare size={12} />
                 <span>{completedSubtasks}/{totalSubtasks} Subtasks</span>
               </span>

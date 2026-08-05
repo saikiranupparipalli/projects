@@ -81,7 +81,7 @@ export function AuthScreen({ onLoginSuccess }) {
             <ListTodo size={26} />
           </div>
           <div>
-            <h1 style={{ fontSize: '1.6rem', fontWeight: 700, letterSpacing: '0.04em', fontFamily: 'Cinzel, serif' }}>Backlogs</h1>
+            <h1 style={{ fontSize: '1.6rem', fontWeight: 700, letterSpacing: '0.04em', fontFamily: 'Cinzel, serif' }}>c inbox</h1>
             <p style={{ fontSize: '0.86rem', color: '#6e675f', marginTop: '0.2rem' }}>
               {isSignUp ? 'Create your personal account' : 'Sign in to access your backlogs'}
             </p>

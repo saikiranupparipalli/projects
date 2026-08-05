@@ -60,36 +60,36 @@ export function TimelineItem({
       <div className={`task-card glass-card ${task.completed ? 'completed' : ''}`} style={{ flex: 1 }}>
         <div className="task-main-row">
           <div className="task-details">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem' }}>
+            <div className="task-card-header-row">
               <span className="task-title-text">{task.title}</span>
 
               {/* Quick Actions */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+              <div className="task-actions-row">
                 <button 
                   onClick={() => onToggleStar(task.id)}
                   style={{ color: task.starred ? '#fbbf24' : 'var(--text-subtle)' }}
-                  className="icon-btn"
+                  className="icon-btn task-action-btn"
                   title={task.starred ? "Unstar" : "Star"}
                 >
                   <Star size={15} fill={task.starred ? '#fbbf24' : 'transparent'} />
                 </button>
                 
-                <button onClick={() => onEdit(task)} className="icon-btn" title="Edit item">
+                <button onClick={() => onEdit(task)} className="icon-btn task-action-btn" title="Edit item">
                   <Edit3 size={14} />
                 </button>
 
-                <button onClick={() => onDuplicate(task)} className="icon-btn" title="Duplicate">
+                <button onClick={() => onDuplicate(task)} className="icon-btn task-action-btn" title="Duplicate">
                   <Copy size={14} />
                 </button>
 
-                <button onClick={() => onDelete(task.id)} className="icon-btn" title="Delete">
+                <button onClick={() => onDelete(task.id)} className="icon-btn task-action-btn" title="Delete">
                   <Trash2 size={14} style={{ color: 'var(--priority-urgent)' }} />
                 </button>
 
                 {totalSubtasks > 0 && (
                   <button 
                     onClick={() => setExpanded(!expanded)} 
-                    className="icon-btn"
+                    className="icon-btn task-action-btn"
                     title={expanded ? "Hide checklist" : "Show checklist"}
                   >
                     {expanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}

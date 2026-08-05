@@ -19,7 +19,8 @@ export function StatsDashboard({ isOpen, onClose, tasks, stats }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content glass-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+      <div className="modal-content glass-card mobile-bottom-sheet" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+        <div className="mobile-sheet-drag-handle" />
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <Award size={22} style={{ color: 'var(--primary)' }} />
@@ -30,7 +31,7 @@ export function StatsDashboard({ isOpen, onClose, tasks, stats }) {
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+        <div className="stats-grid">
           {/* Progress Circular Meter */}
           <div className="glass-card" style={{ padding: '1.2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="120" height="120" viewBox="0 0 120 120">

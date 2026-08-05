@@ -27,11 +27,11 @@ export function TaskList({
 
         <div className="toolbar-controls">
           {tasks.length > 0 && (
-            <>
+            <div className="toolbar-action-buttons">
               <button 
                 onClick={onMarkAllCompleted} 
                 className="btn-secondary" 
-                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
+                style={{ fontSize: '0.78rem', padding: '0.4rem 0.65rem', justifyContent: 'center' }}
                 title="Mark all items in view as completed"
               >
                 <CheckSquare size={14} />
@@ -41,21 +41,22 @@ export function TaskList({
               <button 
                 onClick={onClearCompleted} 
                 className="btn-secondary" 
-                style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem', color: 'var(--priority-urgent)' }}
+                style={{ fontSize: '0.78rem', padding: '0.4rem 0.65rem', color: 'var(--priority-urgent)', justifyContent: 'center' }}
                 title="Remove completed items"
               >
                 <Trash2 size={14} />
                 <span>Clear Completed</span>
               </button>
-            </>
+            </div>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <ArrowUpDown size={14} style={{ color: 'var(--text-muted)' }} />
+          <div className="toolbar-sort-group">
+            <ArrowUpDown size={14} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
             <select 
               value={sortBy} 
               onChange={(e) => setSortBy(e.target.value)}
               className="custom-select"
+              style={{ width: '100%' }}
             >
               <option value="dueDate">Sort by Due Date</option>
               <option value="priority">Sort by Priority</option>

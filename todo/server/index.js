@@ -18,11 +18,11 @@ app.use('/api/tasks', taskRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backlogs Express + MongoDB Server is running' });
+  res.json({ status: 'ok', message: 'c inbox Express + MongoDB Server is running' });
 });
 
 // Start listening immediately on port 5000
 app.listen(PORT, () => {
-  console.log(`🚀 Backlogs API Server listening on http://localhost:${PORT}`);
+  console.log(`🚀 c inbox API Server listening on http://localhost:${PORT}`);
   connectDB();
 });

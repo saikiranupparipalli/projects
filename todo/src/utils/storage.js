@@ -75,9 +75,9 @@ export const INITIAL_SETTINGS = {
 };
 
 export const INITIAL_STATS = {
-  streakCount: 3,
-  lastCompletedDate: getTodayISOString(),
-  totalCompletedCount: 18
+  streakCount: 0,
+  lastCompletedDate: '',
+  totalCompletedCount: 0
 };
 
 export function loadStoredData(key, fallback) {

@@ -102,7 +102,8 @@ export function TaskModal({ isOpen, onClose, onSave, taskToEdit, initialData }) 
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content mobile-bottom-sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="mobile-sheet-drag-handle" />
         <div className="modal-header">
           <h2 style={{ fontSize: '1.15rem' }}>{taskToEdit ? 'Edit Task' : 'Create New Task'}</h2>
           <button onClick={onClose} className="icon-btn">

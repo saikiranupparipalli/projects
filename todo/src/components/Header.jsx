@@ -1,16 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  ListTodo, Search, Sun, SlidersHorizontal, Volume2, VolumeX, 
-  BarChart2, Flame, Settings, Plus, LogOut, Menu, X 
+import {
+  ListTodo, Search, Sun, SlidersHorizontal, Volume2, VolumeX,
+  BarChart2, Flame, Settings, Plus, LogOut, Menu, X
 } from 'lucide-react';
 
-export function Header({ 
-  searchQuery, 
-  setSearchQuery, 
-  brightness = 100, 
-  setBrightness, 
-  soundEnabled, 
-  setSoundEnabled, 
+export function Header({
+  searchQuery,
+  setSearchQuery,
+  brightness = 100,
+  setBrightness,
+  soundEnabled,
+  setSoundEnabled,
   streakCount = 0,
   onOpenStats,
   onOpenSettings,
@@ -56,7 +56,7 @@ export function Header({
     <header className="app-header glass-panel">
       {/* Brand & Mobile Hamburger Toggle */}
       <div className="header-brand">
-        <button 
+        <button
           onClick={onToggleMobileSidebar}
           className="mobile-menu-btn"
           title={isMobileSidebarOpen ? "Close navigation" : "Open navigation"}
@@ -68,16 +68,16 @@ export function Header({
           <ListTodo size={20} />
         </div>
         <div>
-          <h1 className="brand-title">Backlogs</h1>
+          <h1 className="brand-title">c inbox</h1>
         </div>
       </div>
 
       {/* Search Bar */}
       <div className="header-search">
         <Search size={15} className="search-icon-left" />
-        <input 
+        <input
           ref={searchInputRef}
-          type="text" 
+          type="text"
           placeholder="Search backlogs... (/)"
           value={searchQuery || ''}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -88,88 +88,41 @@ export function Header({
 
       {/* Header Actions & Controls */}
       <div className="header-actions">
-        <button 
-          onClick={onOpenNewTaskModal} 
-          className="btn-primary"
+        <button
+          onClick={onOpenNewTaskModal}
+          className="btn-primary desktop-new-btn"
           title="New Task (Press N)"
         >
           <Plus size={16} />
-          <span className="btn-text">New Item</span>
+          <span className="btn-text">new log</span>
         </button>
 
-        {streakCount > 0 && (
+        {streakCount >= 0 && (
           <div className="streak-badge" title={`${streakCount} day productivity streak!`}>
             <Flame size={16} />
             <span>{streakCount}d</span>
           </div>
         )}
 
-        <button 
-          onClick={onOpenStats} 
-          className="icon-btn" 
+        <button
+          onClick={onOpenStats}
+          className="icon-btn header-stat-btn"
           title="Productivity Dashboard"
         >
           <BarChart2 size={16} />
         </button>
 
-        <button 
-          onClick={() => setSoundEnabled && setSoundEnabled(!soundEnabled)} 
-          className="icon-btn" 
+        <button
+          onClick={() => setSoundEnabled && setSoundEnabled(!soundEnabled)}
+          className="icon-btn header-extra-btn"
           title={soundEnabled ? "Mute sound" : "Enable sound"}
         >
           {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
         </button>
 
-        {/* Brightness Adjustment Button & Popover */}
-        <div style={{ position: 'relative' }} ref={brightnessRef}>
-          <button 
-            onClick={() => setShowBrightnessPopover(!showBrightnessPopover)}
-            className="icon-btn"
-            title="Adjust Brightness (Max 110%)"
-            style={{
-              color: showBrightnessPopover ? 'var(--primary)' : 'var(--text-muted)',
-              borderColor: showBrightnessPopover ? 'var(--primary)' : 'var(--border-color)'
-            }}
-          >
-            <SlidersHorizontal size={16} />
-          </button>
-
-          {showBrightnessPopover && (
-            <div style={{
-              position: 'absolute',
-              right: 0,
-              top: '120%',
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-full)',
-              padding: '0.5rem 1rem',
-              boxShadow: 'var(--glass-shadow)',
-              zIndex: 100,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.65rem',
-              whiteSpace: 'nowrap'
-            }}>
-              <Sun size={15} style={{ color: 'var(--primary)' }} />
-              <input 
-                type="range"
-                min="80"
-                max="110"
-                value={brightness}
-                onChange={(e) => setBrightness && setBrightness(Number(e.target.value))}
-                onMouseUp={() => setShowBrightnessPopover(false)}
-                onTouchEnd={() => setShowBrightnessPopover(false)}
-                className="brightness-range-input"
-                style={{ width: '110px' }}
-              />
-              <span className="brightness-val-text">{brightness}%</span>
-            </div>
-          )}
-        </div>
-
-        <button 
-          onClick={onOpenSettings} 
-          className="icon-btn" 
+        <button
+          onClick={onOpenSettings}
+          className="icon-btn"
           title="Settings"
         >
           <Settings size={16} />
@@ -178,7 +131,7 @@ export function Header({
         {/* User Profile Avatar & Dropdown Menu */}
         {currentUser && (
           <div style={{ position: 'relative' }} ref={userMenuRef}>
-            <button 
+            <button
               onClick={() => setShowUserMenu(!showUserMenu)}
               style={{
                 width: '38px',
@@ -220,7 +173,7 @@ export function Header({
                   <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentUser.email}</div>
                 </div>
                 <div style={{ height: '1px', background: 'var(--border-color)' }} />
-                <button 
+                <button
                   onClick={() => {
                     setShowUserMenu(false);
                     onLogout && onLogout();
