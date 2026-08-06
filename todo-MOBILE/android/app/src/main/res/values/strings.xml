@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">c inbox</string>
+    <string name="title_activity_main">c inbox</string>
+    <string name="package_name">com.blackbox.cinbox</string>
+    <string name="custom_url_scheme">com.blackbox.cinbox</string>
+</resources>
