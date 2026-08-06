@@ -3,9 +3,28 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Log = require('../models/Log');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'backlogs_secret_key';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'backlogs_refresh_secret_key_2026';
+
+// Helper function to generate AccessToken (2 days) and RefreshToken (2 months)
+const generateTokens = (user) => {
+  const accessToken = jwt.sign(
+    { id: user._id, email: user.email, name: user.name },
+    JWT_SECRET,
+    { expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '2d' }
+  );
+
+  const refreshToken = jwt.sign(
+    { id: user._id, email: user.email },
+    JWT_REFRESH_SECRET,
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '60d' }
+  );
+
+  return { accessToken, refreshToken };
+};
 
 // @route   POST /api/auth/register
 // @desc    Register a new user
@@ -14,10 +33,22 @@ router.post('/register', async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please provide all required fields' });
+      return res.status(400).json({ message: 'Please provide all required fields (name, email, password)' });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const cleanName = name.trim();
+    const cleanEmail = email.trim().toLowerCase();
+
+    const emailRegex = /^\S+@\S+\.\S+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({ message: 'Please provide a valid email address' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    }
+
+    const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
       return res.status(400).json({ message: 'An account with this email already exists' });
     }
@@ -26,17 +57,30 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
 
     const newUser = await User.create({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
+      name: cleanName,
+      email: cleanEmail,
       passwordHash
     });
 
-    const token = jwt.sign({ id: newUser._id, email: newUser.email, name: newUser.name }, JWT_SECRET, {
-      expiresIn: '30d'
-    });
+    // Record registration user log
+    try {
+      await Log.create({
+        userId: newUser._id,
+        action: 'USER_REGISTER',
+        title: 'Account created',
+        details: `Registered account for ${newUser.name} (${cleanEmail})`,
+        type: 'auth'
+      });
+    } catch (logErr) {
+      console.error('Failed to log registration:', logErr);
+    }
+
+    const { accessToken, refreshToken } = generateTokens(newUser);
 
     res.status(201).json({
-      token,
+      accessToken,
+      refreshToken,
+      token: accessToken,
       user: {
         id: newUser._id.toString(),
         name: newUser.name,
@@ -45,6 +89,13 @@ router.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.error('Registration error details:', err);
+    if (err.code === 11000 || (err.name === 'MongoServerError' && err.code === 11000)) {
+      return res.status(400).json({ message: 'An account with this email already exists' });
+    }
+    if (err.name === 'ValidationError') {
+      const msg = Object.values(err.errors || {}).map(e => e.message).join(', ') || 'Validation error during registration';
+      return res.status(400).json({ message: msg });
+    }
     res.status(500).json({ message: err.message || 'Server error during registration', error: err.toString() });
   }
 });
@@ -59,7 +110,8 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Please provide email and password' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -73,12 +125,25 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user._id, email: user.email, name: user.name }, JWT_SECRET, {
-      expiresIn: '30d'
-    });
+    // Record login user log
+    try {
+      await Log.create({
+        userId: user._id,
+        action: 'USER_LOGIN',
+        title: 'User logged in',
+        details: `Successful login for ${user.email}`,
+        type: 'auth'
+      });
+    } catch (logErr) {
+      console.error('Failed to log login:', logErr);
+    }
+
+    const { accessToken, refreshToken } = generateTokens(user);
 
     res.json({
-      token,
+      accessToken,
+      refreshToken,
+      token: accessToken,
       user: {
         id: user._id.toString(),
         name: user.name,
@@ -88,6 +153,39 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     console.error('Login error details:', err);
     res.status(500).json({ message: err.message || 'Server error during login', error: err.toString() });
+  }
+});
+
+// @route   POST /api/auth/refresh
+// @desc    Generate a new access token using a valid refresh token (valid for 2 months)
+router.post('/refresh', async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return res.status(401).json({ message: 'Refresh token is required' });
+    }
+
+    const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const tokens = generateTokens(user);
+
+    res.json({
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      token: tokens.accessToken,
+      user: {
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (err) {
+    console.error('Refresh token error details:', err);
+    return res.status(401).json({ message: 'Invalid or expired refresh token' });
   }
 });
 

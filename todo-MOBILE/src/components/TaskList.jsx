@@ -73,7 +73,7 @@ export function TaskList({
           <div className="empty-icon">
             <Sparkles size={28} />
           </div>
-          <h4 style={{ fontSize: '1.05rem' }}>No backlog items found</h4>
+          <h4 style={{ fontSize: '1.05rem' }}>No log items found</h4>
           <p style={{ maxWidth: '340px', fontSize: '0.88rem' }}>
             All clear! You've completed everything in this view or no items match your search.
           </p>

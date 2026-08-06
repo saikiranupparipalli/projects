@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-// import mongoose from "mongoose"
 
 const UserSchema = new mongoose.Schema(
   {
@@ -12,8 +11,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Email is required'],
       unique: true,
+      index: true,
       lowercase: true,
       trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address'],
     },
     passwordHash: {
       type: String,

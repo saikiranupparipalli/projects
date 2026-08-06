@@ -6,6 +6,7 @@ import { TaskList } from './components/TaskList';
 import { TaskModal } from './components/TaskModal';
 import { StatsDashboard } from './components/StatsDashboard';
 import { SettingsModal } from './components/SettingsModal';
+import { LogsModal } from './components/LogsModal';
 import { Toast } from './components/Toast';
 import { AuthScreen } from './components/AuthScreen';
 import { MobileBottomNav } from './components/MobileBottomNav';
@@ -18,13 +19,20 @@ import { isSameDay, getTodayISOString, getGreeting } from './utils/dates';
 import { INITIAL_TASKS, INITIAL_SETTINGS, INITIAL_STATS } from './utils/storage';
 import { getCurrentUser, logoutUser } from './utils/auth';
 import { api } from './utils/api';
+import { loadStoredData, saveStoredData } from './utils/storage';
 
 export function App() {
   // Authentication State (Requires MongoDB Atlas Login / Register)
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
 
   // Tasks & Settings States
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    const user = getCurrentUser();
+    if (user) {
+      return loadStoredData(`backlogs_tasks_${user.id}`, []);
+    }
+    return [];
+  });
   const [settings, setSettings] = useLocalStorage('backlogs_settings', {
     ...INITIAL_SETTINGS,
     brightness: 100
@@ -41,20 +49,36 @@ export function App() {
   // Responsive Mobile Drawer state
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Fetch tasks from MongoDB Backend when logged in
+  // Fetch tasks from MongoDB Backend when logged in, with offline/cache fallback
   useEffect(() => {
     async function loadBackendTasks() {
       if (currentUser) {
+        // Load initial cached tasks
+        const cached = loadStoredData(`backlogs_tasks_${currentUser.id}`, null);
+        if (cached && Array.isArray(cached) && cached.length > 0) {
+          setTasks(cached);
+        }
+
         const res = await api.getTasks();
         if (res.success && Array.isArray(res.data)) {
           setTasks(res.data);
-        } else {
-          setTasks([]);
+          saveStoredData(`backlogs_tasks_${currentUser.id}`, res.data);
         }
       }
     }
     loadBackendTasks();
   }, [currentUser]);
+
+  // Helper to update tasks state and persistent cache simultaneously
+  const updateTasks = (newTasksOrUpdater) => {
+    setTasks((prevTasks) => {
+      const nextTasks = typeof newTasksOrUpdater === 'function' ? newTasksOrUpdater(prevTasks) : newTasksOrUpdater;
+      if (currentUser) {
+        saveStoredData(`backlogs_tasks_${currentUser.id}`, nextTasks);
+      }
+      return nextTasks;
+    });
+  };
 
   // Active view filters
   const [currentFilter, setCurrentFilter] = useState('all');
@@ -68,6 +92,7 @@ export function App() {
   const [modalInitialData, setModalInitialData] = useState(null);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isLogsOpen, setIsLogsOpen] = useState(false);
   const [toast, setToast] = useState(null);
 
   const searchInputRef = useRef(null);
@@ -96,9 +121,11 @@ export function App() {
       setIsTaskModalOpen(false);
       setIsStatsOpen(false);
       setIsSettingsOpen(false);
+      setIsLogsOpen(false);
       setIsMobileSidebarOpen(false);
     }
   });
+
 
   // Calculate task statistics
   const counts = useMemo(() => {
@@ -198,33 +225,33 @@ export function App() {
     if (selectedTag) return `Tag: #${selectedTag}`;
     const map = {
       all: 'ls',
-      today: "Today's Backlog",
-      upcoming: 'Upcoming Backlog',
+      today: "Today's Logs",
+      upcoming: 'Upcoming Logs',
       important: 'Important Items',
-      overdue: 'Overdue Backlog',
-      completed: 'Completed Backlog'
+      overdue: 'Overdue Logs',
+      completed: 'Completed Logs'
     };
-    return map[currentFilter] || 'Backlogs';
+    return map[currentFilter] || 'Logs';
   }, [currentFilter, selectedTag]);
 
   // CRUD Handlers
   const handleAddTask = async (newTaskData) => {
     const tempId = `task-${Date.now()}`;
     const tempTask = { id: tempId, createdAt: new Date().toISOString(), completed: false, ...newTaskData };
-    setTasks([tempTask, ...tasks]);
+    updateTasks((prev) => [tempTask, ...prev]);
     soundFx.playAdd();
 
     const res = await api.createTask(newTaskData);
     if (res.success && res.data) {
-      setTasks((prev) => prev.map((t) => (t.id === tempId ? res.data : t)));
+      updateTasks((prev) => prev.map((t) => (t.id === tempId ? res.data : t)));
     }
-    showToast('Backlog item created');
+    showToast('Log item created');
   };
 
   const handleUpdateTask = async (updatedData) => {
     if (updatedData.id) {
-      setTasks(tasks.map((t) => (t.id === updatedData.id ? { ...t, ...updatedData } : t)));
-      showToast('Backlog item updated');
+      updateTasks((prev) => prev.map((t) => (t.id === updatedData.id ? { ...t, ...updatedData } : t)));
+      showToast('Log item updated');
       await api.updateTask(updatedData.id, updatedData);
     } else {
       handleAddTask(updatedData);
@@ -236,8 +263,8 @@ export function App() {
     if (!target) return;
     const nextState = !target.completed;
 
-    setTasks(
-      tasks.map((t) => {
+    updateTasks((prev) =>
+      prev.map((t) => {
         if (t.id === taskId) {
           if (nextState) {
             soundFx.playCheck();
@@ -277,7 +304,7 @@ export function App() {
     if (!target) return;
     const nextStarred = !target.starred;
 
-    setTasks(tasks.map((t) => (t.id === taskId ? { ...t, starred: nextStarred } : t)));
+    updateTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, starred: nextStarred } : t)));
     await api.updateTask(taskId, { starred: nextStarred });
   };
 
@@ -289,8 +316,8 @@ export function App() {
       s.id === subtaskId ? { ...s, completed: !s.completed } : s
     );
 
-    setTasks(
-      tasks.map((t) => (t.id === taskId ? { ...t, subtasks: updatedSubtasks } : t))
+    updateTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, subtasks: updatedSubtasks } : t))
     );
 
     await api.updateTask(taskId, { subtasks: updatedSubtasks });
@@ -314,7 +341,7 @@ export function App() {
     const target = tasks.find((t) => t.id === taskId);
     if (target) {
       lastDeletedTaskRef.current = target;
-      setTasks(tasks.filter((t) => t.id !== taskId));
+      updateTasks((prev) => prev.filter((t) => t.id !== taskId));
       soundFx.playDelete();
       showToast(`Deleted "${target.title.slice(0, 18)}..."`, true);
       await api.deleteTask(taskId);
@@ -324,7 +351,7 @@ export function App() {
   const handleUndoDelete = async () => {
     if (lastDeletedTaskRef.current) {
       const restored = lastDeletedTaskRef.current;
-      setTasks([restored, ...tasks]);
+      updateTasks((prev) => [restored, ...prev]);
       lastDeletedTaskRef.current = null;
       setToast(null);
       await api.createTask(restored);
@@ -332,19 +359,20 @@ export function App() {
   };
 
   const handleClearCompleted = async () => {
-    setTasks(tasks.filter((t) => !t.completed));
+    updateTasks((prev) => prev.filter((t) => !t.completed));
     showToast('Cleared completed items');
     await api.clearCompleted();
   };
 
   const handleMarkAllCompleted = () => {
     const idsInView = new Set(filteredTasks.map((t) => t.id));
-    setTasks(tasks.map((t) => (idsInView.has(t.id) ? { ...t, completed: true } : t)));
+    updateTasks((prev) => prev.map((t) => (idsInView.has(t.id) ? { ...t, completed: true } : t)));
     soundFx.playFanfare();
     triggerTaskConfetti();
     showToast('Marked view items as done');
     filteredTasks.forEach((t) => api.updateTask(t.id, { completed: true }));
   };
+
 
   const handleLogout = () => {
     logoutUser();
@@ -360,11 +388,11 @@ export function App() {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(tasks, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `backlogs_${currentUser ? currentUser.name : 'export'}_${getTodayISOString()}.json`);
+    downloadAnchor.setAttribute('download', `logs_${currentUser ? currentUser.name : 'export'}_${getTodayISOString()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    showToast('Exported backlogs to JSON');
+    showToast('Exported logs to JSON');
   };
 
   const handleExportCSV = () => {
@@ -379,16 +407,16 @@ export function App() {
     const dataStr = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `backlogs_export_${getTodayISOString()}.csv`);
+    downloadAnchor.setAttribute('download', `logs_export_${getTodayISOString()}.csv`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    showToast('Exported backlogs to CSV');
+    showToast('Exported logs to CSV');
   };
 
   const handleImportJSON = async (importedTasks) => {
     setTasks(importedTasks);
-    showToast(`Imported ${importedTasks.length} backlog items`);
+    showToast(`Imported ${importedTasks.length} log items`);
     for (const t of importedTasks) {
       await api.createTask(t);
     }
@@ -402,10 +430,10 @@ export function App() {
   };
 
   const handleClearAllData = async () => {
-    if (confirm('Wipe ALL backlog items for your account?')) {
+    if (confirm('Wipe ALL log items for your account?')) {
       setTasks([]);
       setStats({ streakCount: 0, lastCompletedDate: '', totalCompletedCount: 0 });
-      showToast('Backlog data cleared');
+      showToast('Log data cleared');
       await api.clearCompleted();
     }
   };
@@ -426,6 +454,7 @@ export function App() {
         streakCount={stats.streakCount}
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenLogs={() => setIsLogsOpen(true)}
         onOpenNewTaskModal={() => {
           setTaskToEdit(null);
           setModalInitialData(null);
@@ -553,6 +582,11 @@ export function App() {
         onImportJSON={handleImportJSON}
         onResetSampleData={handleResetSampleData}
         onClearAllData={handleClearAllData}
+      />
+
+      <LogsModal
+        isOpen={isLogsOpen}
+        onClose={() => setIsLogsOpen(false)}
       />
 
       <Toast

@@ -1,4 +1,4 @@
-import { api, setAuthToken, getAuthToken } from './api';
+import { api, setAuthTokens, getAuthToken } from './api';
 import { loadStoredData, saveStoredData } from './storage';
 
 const USERS_KEY = 'backlogs_users';
@@ -23,8 +23,11 @@ export async function loginUser(email, password) {
   // Try Backend MongoDB first
   const apiRes = await api.login(email, password);
   if (apiRes.success && apiRes.data) {
-    const { token, user } = apiRes.data;
-    setAuthToken(token);
+    const { accessToken, refreshToken, token, user } = apiRes.data;
+    setAuthTokens({
+      accessToken: accessToken || token,
+      refreshToken
+    });
     saveStoredData(CURRENT_USER_KEY, user);
     return { success: true, user };
   }
@@ -50,8 +53,11 @@ export async function registerUser(name, email, password) {
   // Try Backend MongoDB first
   const apiRes = await api.register(name, email, password);
   if (apiRes.success && apiRes.data) {
-    const { token, user } = apiRes.data;
-    setAuthToken(token);
+    const { accessToken, refreshToken, token, user } = apiRes.data;
+    setAuthTokens({
+      accessToken: accessToken || token,
+      refreshToken
+    });
     saveStoredData(CURRENT_USER_KEY, user);
     return { success: true, user };
   }
@@ -85,6 +91,6 @@ export async function registerUser(name, email, password) {
 }
 
 export function logoutUser() {
-  setAuthToken('');
+  setAuthTokens('');
   localStorage.removeItem(CURRENT_USER_KEY);
 }
