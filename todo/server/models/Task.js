@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+// import mongoose from "mongoose"
 const SubtaskSchema = new mongoose.Schema({
   title: { type: String, required: true },
   completed: { type: Boolean, default: false }
