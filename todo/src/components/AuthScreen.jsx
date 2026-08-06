@@ -18,7 +18,17 @@ export function AuthScreen({ onLoginSuccess }) {
     try {
       if (isSignUp) {
         if (!name.trim()) {
-          setError('Please enter your name.');
+          setError('Please enter your full name.');
+          setLoading(false);
+          return;
+        }
+        if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email.trim())) {
+          setError('Please enter a valid email address.');
+          setLoading(false);
+          return;
+        }
+        if (!password || password.length < 6) {
+          setError('Password must be at least 6 characters long.');
           setLoading(false);
           return;
         }
@@ -83,7 +93,7 @@ export function AuthScreen({ onLoginSuccess }) {
           <div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 700, letterSpacing: '0.04em', fontFamily: 'Cinzel, serif' }}>c inbox</h1>
             <p style={{ fontSize: '0.86rem', color: '#6e675f', marginTop: '0.2rem' }}>
-              {isSignUp ? 'Create your personal account' : 'Sign in to access your backlogs'}
+              {isSignUp ? 'Create your personal account' : 'Sign in to access your logs'}
             </p>
           </div>
         </div>

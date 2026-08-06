@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   ListTodo, Search, Sun, SlidersHorizontal, Volume2, VolumeX,
-  BarChart2, Flame, Settings, Plus, LogOut, Menu, X
+  BarChart2, Flame, Settings, Plus, LogOut, Menu, X, FileText
 } from 'lucide-react';
 
 export function Header({
@@ -14,6 +14,7 @@ export function Header({
   streakCount = 0,
   onOpenStats,
   onOpenSettings,
+  onOpenLogs,
   onOpenNewTaskModal,
   searchInputRef,
   currentUser,
@@ -78,7 +79,7 @@ export function Header({
         <input
           ref={searchInputRef}
           type="text"
-          placeholder="Search backlogs... (/)"
+          placeholder="Search logs... (/)"
           value={searchQuery || ''}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
@@ -103,6 +104,14 @@ export function Header({
             <span>{streakCount}d</span>
           </div>
         )}
+
+        <button
+          onClick={onOpenLogs}
+          className="icon-btn header-stat-btn"
+          title="User Activity Logs"
+        >
+          <FileText size={16} />
+        </button>
 
         <button
           onClick={onOpenStats}
@@ -173,6 +182,17 @@ export function Header({
                   <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentUser.email}</div>
                 </div>
                 <div style={{ height: '1px', background: 'var(--border-color)' }} />
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    onOpenLogs && onOpenLogs();
+                  }}
+                  className="btn-secondary"
+                  style={{ justifyContent: 'flex-start', padding: '0.45rem 0.6rem', border: 'none' }}
+                >
+                  <FileText size={14} />
+                  <span>Activity Logs</span>
+                </button>
                 <button
                   onClick={() => {
                     setShowUserMenu(false);
