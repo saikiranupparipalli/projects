@@ -1,11 +1,15 @@
- import {Timer} from "./Hooks/Timer"
+ import { Timer } from "./Components/Timer";
 import "./App.css";
+import { StopWatch } from "./Components/Stopwatch";
 // import {Timer} from "./Components/timer"
 function App() {
-   return (
+  return (
+    <div>
+      <Timer />
+    <StopWatch/>
+    </div>
+  );
 
-    <Timer/>
-   )
 }
 
 export default App;
