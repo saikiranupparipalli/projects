@@ -101,29 +101,49 @@
 /* Component Inner Layout */
 .component-wrapper > div {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
+  gap: 10px;
   width: 100%;
+  position: relative;
 }
 
 /* Clock Display H1 */
 .component-wrapper h1 {
+  order: 1;
+  width: 100%;
+  flex-basis: 100%;
   font-family: 'Google Sans', Roboto, sans-serif;
   font-size: 72px;
   font-weight: 400;
   color: var(--google-text-primary);
   letter-spacing: -1.5px;
   line-height: 1;
-  margin: 0 0 36px 0;
+  margin: 0 0 24px 0;
   text-align: center;
   font-variant-numeric: tabular-nums;
   transition: color 0.2s ease;
 }
 
-/* Control Buttons Wrapper */
-.component-wrapper > div {
-  position: relative;
+/* Preset Buttons (+5:00, +1:00, +30:00) - Row 2 (Centered) */
+.component-wrapper button:nth-of-type(n+3) {
+  order: 2;
+}
+
+/* Line break between Preset buttons and Action buttons */
+.component-wrapper > div::after {
+  content: "";
+  width: 100%;
+  order: 3;
+  height: 2px;
+}
+
+/* Action Buttons (Start & Restart) - Row 3 (Below Preset Buttons) */
+.component-wrapper button:nth-of-type(1),
+.component-wrapper button:nth-of-type(2) {
+  order: 4;
 }
 
 /* Base button reset for components */
@@ -132,25 +152,17 @@
   font-size: 14px;
   font-weight: 500;
   height: 36px;
-  padding: 0 24px;
+  padding: 0 20px;
   border-radius: 18px;
   cursor: pointer;
   outline: none;
+  white-space: nowrap;
   transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
   user-select: none;
 }
 
 .component-wrapper button:active {
   transform: scale(0.97);
-}
-
-/* Button Group Alignment */
-.component-wrapper > div {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
 }
 
 /* Primary Action Button ("start" button in both Timer & Stopwatch) */
@@ -161,7 +173,7 @@
   letter-spacing: 0.5px;
   text-transform: uppercase;
   font-weight: 500;
-  padding: 0 32px;
+  padding: 0 28px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
@@ -170,12 +182,12 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
 }
 
-/* Secondary / Preset Buttons (+5:00, +1:00, +30:00, resume) */
+/* Secondary / Preset Buttons (+5:00, +1:00, +30:00, restart) */
 .component-wrapper button:not(:nth-of-type(1)) {
   background-color: var(--google-btn-secondary-bg);
   color: var(--google-btn-secondary-text);
   border: 1px solid var(--google-border);
-  padding: 0 20px;
+  padding: 0 16px;
 }
 
 .component-wrapper button:not(:nth-of-type(1)):hover {
@@ -191,12 +203,20 @@
   }
   
   .google-card-body {
-    padding: 32px 20px 28px 20px;
+    padding: 32px 12px 28px 12px;
+  }
+
+  .component-wrapper > div {
+    gap: 6px;
   }
 
   .component-wrapper button {
     height: 34px;
-    padding: 0 18px;
-    font-size: 13px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .component-wrapper button:nth-of-type(1) {
+    padding: 0 16px;
   }
 }

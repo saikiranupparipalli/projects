@@ -17,20 +17,24 @@ export const Stopwatch = () => {
   }, [rendering, timeStamp]);
   const minutes = Math.floor(seconds / 60);
   const displaySeconds = seconds % 60;
-  const hrs = Math.floor(minutes / 60);
+  const displayMinutes = (minutes % 60)
+
+  const hrs = Math.floor(minutes / 60)
+  const displayHrs = hrs % 60
   return (
     <div>
       <h1>
-        {hrs}:{minutes}:{displaySeconds}
+      {displayHrs}:{displayMinutes}:{displaySeconds}
       </h1>
       <button
         onClick={() => {
           {
+            setTimeStamp(Date.now() - seconds * 1000)
             isRendering(!rendering);
           }
-          {
-            setTimeStamp(Date.now());
-          }
+          // {
+          //   
+          // }
         }}
       >
         start
@@ -39,13 +43,14 @@ export const Stopwatch = () => {
       <button
         onClick={() => {
           {
-            setTimeStamp(Date.now() - seconds * 1000);
-            isRendering(!rendering);
+           setSeconds(0)
+            isRendering(false);
           }
         }}
       >
-        resume
+        restart
       </button>
+      
     </div>
   );
 };

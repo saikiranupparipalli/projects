@@ -2,7 +2,7 @@ import * as React from "react";
 
 export function Timer() {
   const [timer, setTimer] = React.useState<number>(0);
-  const [isRunning, setIsRunning] = React.useState<Boolean>(false);
+  const [isRunning, setIsRunning] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -29,10 +29,33 @@ export function Timer() {
       <h1>
         {minutes}:{seconds.toString().padStart(2, "0")}
       </h1>
-      <button onClick={() => setIsRunning(!isRunning)}>start</button>
+      <button
+        onClick={() => {
+          setIsRunning(!isRunning);
+        }}
+      >
+        start
+      </button>
+
+      {/* <button
+        onClick={() => {
+        
+        }}
+      >
+        restart
+      </button> */}
+      <button
+        onClick={() => {
+          setTimer(0);
+          setIsRunning(false);
+        }}
+      >
+        restart
+      </button>
+
       <button onClick={() => setTimer(timer + 300)}>+5:00</button>
       <button onClick={() => setTimer(timer + 60)}>+1:00</button>
-      <button onClick={() => setTimer(timer + 30)}>+30:00</button>
+      <button onClick={() => setTimer(timer + 1800)}>+30:00</button>
     </div>
   );
 }
