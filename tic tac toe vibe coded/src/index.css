@@ -1,0 +1,106 @@
+ @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap');
+
+:root {
+  --font-main: 'Fredoka', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  
+  /* Light Theme Variables */
+  --bg-color: #E0F2FE;
+  --bg-pattern-color: rgba(56, 189, 248, 0.25);
+  --card-bg: #FFFFFF;
+  --card-border: #1E293B;
+  --card-shadow: 0 12px 0 #CBD5E1, 0 16px 24px rgba(15, 23, 42, 0.08);
+  
+  --title-color: #0F172A;
+  --title-stroke: #38BDF8;
+  
+  --cell-bg: #F8FAFC;
+  --cell-hover-bg: #FEF08A;
+  --cell-border: #1E293B;
+  --cell-shadow: 0 6px 0 #CBD5E1;
+  --cell-shadow-hover: 0 8px 0 #94A3B8;
+  --cell-shadow-active: 0 2px 0 #94A3B8;
+  
+  --symbol-color: #FF4757;
+  --symbol-shadow: 2px 3px 0 #1E293B;
+  
+  --winner-bg: #FEF08A;
+  --winner-color: #854D0E;
+  --winner-border: #1E293B;
+  --winner-shadow: 0 6px 0 #FDE047;
+  
+  --reset-bg: #FF6B6B;
+  --reset-hover-bg: #FF5252;
+  --reset-border: #1E293B;
+  --reset-shadow: 0 6px 0 #CBD5E1;
+  
+  --toggle-bg: #FFFFFF;
+  --toggle-border: #1E293B;
+  --toggle-shadow: 0 4px 0 #CBD5E1;
+  --toggle-track-bg: #BAE6FD;
+  --thumb-bg: #FFD93D;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme Variables */
+  --bg-color: #0F172A;
+  --bg-pattern-color: rgba(30, 41, 59, 0.7);
+  --card-bg: #1E293B;
+  --card-border: #38BDF8;
+  --card-shadow: 0 12px 0 #090D16, 0 16px 24px rgba(0, 0, 0, 0.4);
+  
+  --title-color: #F8FAFC;
+  --title-stroke: #0284C7;
+  
+  --cell-bg: #0F172A;
+  --cell-hover-bg: #1E1B4B;
+  --cell-border: #38BDF8;
+  --cell-shadow: 0 6px 0 #090D16;
+  --cell-shadow-hover: 0 8px 0 #020617;
+  --cell-shadow-active: 0 2px 0 #020617;
+  
+  --symbol-color: #FF6B81;
+  --symbol-shadow: 2px 3px 0 #090D16;
+  
+  --winner-bg: #312E81;
+  --winner-color: #E0E7FF;
+  --winner-border: #818CF8;
+  --winner-shadow: 0 6px 0 #1E1B4B;
+  
+  --reset-bg: #FF4757;
+  --reset-hover-bg: #FF6B81;
+  --reset-border: #38BDF8;
+  --reset-shadow: 0 6px 0 #090D16;
+  
+  --toggle-bg: #1E293B;
+  --toggle-border: #38BDF8;
+  --toggle-shadow: 0 4px 0 #090D16;
+  --toggle-track-bg: #0F172A;
+  --thumb-bg: #818CF8;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  background-image: radial-gradient(var(--bg-pattern-color) 2px, transparent 2px);
+  background-size: 24px 24px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
