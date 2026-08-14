@@ -12,8 +12,20 @@ export const Play = () => {
     "",
     "",
   ]);
-  console.log(tic);
+  const [winner, setWinner] = React.useState<null | string>(null);
   const [btn, setbtn] = React.useState<boolean>(false);
+
+  const winningLines = [
+    [0, 1, 2],
+    [0, 3, 6],
+    [1, 4, 7],
+    [3, 4, 5],
+    [2, 5, 8],
+    [6, 7, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  // const [reset, setReset] = React.useState<string[]>([]);
 
   function display(x: number) {
     const newArray = [...tic];
@@ -23,10 +35,19 @@ export const Play = () => {
     } else {
       newArray[x] = "o";
     }
+    winningLines.forEach((e) => {
+      if (
+        newArray[e[0]] === newArray[e[1]] &&
+        newArray[e[1]] === newArray[e[2]] &&
+        newArray[e[0]] !== "" &&
+        newArray[e[1]] !== "" &&
+        newArray[e[2]] !== ""
+      ) {
+        setWinner(`player ${newArray[x]} won`);
+      }
+    });
     setTic(newArray);
     setbtn(!btn);
-
-    
   }
 
   return (
@@ -40,7 +61,7 @@ export const Play = () => {
         >
           {tic[0]}
         </button>
-        <button onClick={() => display(1)}>{tic[1]}</button>
+        <button onClick={() => display(1)}>{tic[1]} </button>
         <button onClick={() => display(2)}>{tic[2]}</button>
       </div>
       <div>
@@ -53,6 +74,17 @@ export const Play = () => {
         <button onClick={() => display(7)}>{tic[7]}</button>
         <button onClick={() => display(8)}>{tic[8]}</button>
       </div>
+
+      <h1>{winner}</h1>
+      <button
+        onClick={() => {
+          setTic(["", "", "", "", "", "", "", "", ""]);
+          setbtn(false);
+          setWinner("");
+        }}
+      >
+        🔄️
+      </button>
     </div>
   );
 };
