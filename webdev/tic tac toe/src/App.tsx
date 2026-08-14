@@ -1,18 +1,15 @@
- import { Play } from './Components/Play'
-import './App.css'
-import { StrictMode } from 'react'
+import { Play } from "./Components/Play";
+import "./App.css";
+import { StrictMode } from "react";
 
 function App() {
- 
-
   return (
     <>
-   <StrictMode>
- <Play/>
-   </StrictMode>
-
+      <StrictMode>
+        <Play />
+      </StrictMode>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
